@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#000000">
+<title>Reading Room · Display</title>
+<style>
+  /* The hand-held phone. It only shows the target photo, as big and bright as possible, nothing drawn over it.
+     The filming device tracks this photo and stands the 3D room on it. */
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; touch-action: pan-x;
+    font: 15px/1.3 -apple-system, system-ui, "Segoe UI", sans-serif; color: #f2efe9; }
+  #track { display: flex; height: 100%; transition: transform .35s cubic-bezier(.2,.8,.2,1); }
+  .slide { flex: 0 0 100vw; height: 100%; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 14px; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); box-sizing: border-box; }
+  .slide img { width: min(100vw, calc((100vh - 110px) * 0.75)); aspect-ratio: 3 / 4; object-fit: cover; display: block;
+    -webkit-user-drag: none; user-select: none; }
+  .name { font-weight: 600; letter-spacing: .02em; opacity: .85; }
+  #dots { position: fixed; bottom: calc(env(safe-area-inset-bottom) + 14px); left: 0; right: 0; display: flex; gap: 6px; justify-content: center; }
+  #dots i { width: 6px; height: 6px; border-radius: 50%; background: #fff; opacity: .3; }
+  #dots i.on { opacity: .9; }
+  #fs { position: fixed; top: calc(env(safe-area-inset-top) + 10px); right: 12px; border: 0; border-radius: 999px;
+    background: rgba(255,255,255,.12); color: #fff; padding: 7px 12px; font: inherit; font-size: 13px; }
+</style>
+</head>
+<body>
+<div id="track"></div>
+<div id="dots"></div>
+<button id="fs" type="button">Full screen</button>
+<script>
+  // One entry per style. Add a style: generate its target with the same crop rules and add a line here and in ar.js.
+  const STYLES = [
+    { name: "Reading Room", img: "image-targets/reading-room_display.jpg" },
+  ];
+  const track = document.getElementById("track"), dots = document.getElementById("dots");
+  STYLES.forEach((s) => {
+    const el = document.createElement("div"); el.className = "slide";
+    el.innerHTML = `<img alt="${s.name}" src="${s.img}"><div class="name">${s.name}</div>`;
+    track.appendChild(el); dots.appendChild(document.createElement("i"));
+  });
+  let i = 0;
+  const go = (n) => { i = Math.max(0, Math.min(STYLES.length - 1, n)); track.style.transform = `translateX(${-i * 100}vw)`;
+    [...dots.children].forEach((d, k) => d.classList.toggle("on", k === i)); };
+  let x0 = null;
+  addEventListener("touchstart", (e) => { x0 = e.touches[0].clientX; }, { passive: true });
+  addEventListener("touchend", (e) => { if (x0 === null) return; const dx = e.changedTouches[0].clientX - x0;
+    if (Math.abs(dx) > 40) go(i + (dx < 0 ? 1 : -1)); x0 = null; });
+  addEventListener("keydown", (e) => { if (e.key === "ArrowRight") go(i + 1); if (e.key === "ArrowLeft") go(i - 1); });
+  go(0);
+  // keep the screen on while filming, where the browser allows it
+  if ("wakeLock" in navigator) { const lock = () => navigator.wakeLock.request("screen").catch(() => {});
+    lock(); document.addEventListener("visibilitychange", () => document.visibilityState === "visible" && lock()); }
+  document.getElementById("fs").addEventListener("click", () => {
+    const d = document.documentElement; (d.requestFullscreen || d.webkitRequestFullscreen || (() => {})).call(d);
+    document.getElementById("fs").hidden = true;
+  });
+</script>
+</body>
+</html>

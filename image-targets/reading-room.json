@@ -1,0 +1,23 @@
+{
+  "type": "PLANAR",
+  "properties": {
+    "top": 0,
+    "left": 441,
+    "width": 576,
+    "height": 768,
+    "isRotated": false,
+    "originalWidth": 1376,
+    "originalHeight": 768
+  },
+  "imagePath": "image-targets/reading-room_luminance.jpg",
+  "metadata": null,
+  "name": "reading-room",
+  "resources": {
+    "originalImage": "reading-room_original.jpg",
+    "croppedImage": "reading-room_cropped.jpg",
+    "thumbnailImage": "reading-room_thumbnail.jpg",
+    "luminanceImage": "reading-room_luminance.jpg"
+  },
+  "created": 1792589630342,
+  "updated": 1792589630342
+}
